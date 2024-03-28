@@ -6,35 +6,36 @@ load = input("csv: ") + ".csv"
 
 phase = 5.877
 
-
 df = pd.read_csv("./saved/"+load)
+df = df[["mjd", "w1mpro", "w1sigmpro", "qual_frame"]]
 df.dropna(how="any", inplace=True)
+df = df[df["qual_frame"] == 10]
 
 df.sort_values(by="mjd", inplace=True)
 
 w1 = df["w1mpro"].values
 w1s = df["w1sigmpro"].values
-w2 = df["w1mpro2"].values
-w2s = df["w2sigmpro"].values
+# w2 = df["w2mpro"].values
+# w2s = df["w2sigmpro"].values
 mjd = df["mjd"].values
 
-mjd = (mjd % phase)/phase
 
 if phase != 0:
+    mjd = (mjd % phase) / phase
     mjd = np.concatenate((mjd, mjd + 1))
     w1 = np.concatenate((w1, w1))
     w1s = np.concatenate((w1s, w1s))
-    w2 = np.concatenate((w2, w2))
-    w2s = np.concatenate((w2s, w2s))
+    # w2 = np.concatenate((w2, w2))
+    # w2s = np.concatenate((w2s, w2s))
 
     
 
 w1_tr = go.Scatter(x=mjd, y=w1, name="W1",
                    error_y=dict(type="data", array=w1s, visible=True, color="rgba(0,0,0,0.55)", thickness=1.25), 
                    mode="markers", marker_symbol="square", marker=dict(size=5, color="rgba(0,0,0,0.55)"))
-w2_tr = go.Scatter(x=mjd, y=w2, name="W2",
-                   error_y=dict(type="data", array=w2s, visible=True, color="rgba(255,165,0,0.55)", thickness=1.25), 
-                   mode="markers", marker_symbol="square", marker=dict(size=5, color="rgba(255,165,0,0.55)"))
+# w2_tr = go.Scatter(x=mjd, y=w2, name="W2",
+#                   error_y=dict(type="data", array=w2s, visible=True, color="rgba(255,165,0,0.55)", thickness=1.25), 
+#                   mode="markers", marker_symbol="square", marker=dict(size=5, color="rgba(255,165,0,0.55)"))
 
 fig = go.Figure(data=[w1_tr])
 fig.update_layout(
@@ -80,4 +81,7 @@ if phase != 0:
     fig.update_xaxes(title="phase")
     fig.update_layout(title="period="+str(phase)+"d", title_x=0.5)
 
-fig.write_image("./saved/"+load[:-4]+".png")
+name = "./saved/"+load[:-4]
+if phase != 0:
+    name += "_folded"
+fig.write_image(name+".png")

@@ -10,7 +10,7 @@ import pyvo
 import names
 
 
-filename = "var"
+filename = "nova"
 service = pyvo.dal.TAPService("https://irsa.ipac.caltech.edu/TAP")
 
 def querywise(ra, dec):
@@ -92,7 +92,10 @@ for i, row in df.iterrows():
 
     q = process(q)
 
+    ra = df.iloc[i]["ra"]
+    dec = df.iloc[i]["dec"]
     plot("Row {} @ {} {}".format(str(i), ra, dec), q)
+    print("{} {}".format(ra, dec))
 
     inp = input("Flag? (y/n): ")
 
